@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoRede — Painel do Morador</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Navbar (RF01) ── -->
+<nav class="eco-navbar">
+  <a class="brand" href="index.html">♻️ <span>Eco</span>Rede</a>
+  <div class="nav-user">
+    <span id="nomeUsuario">Carregando…</span>
+    <a href="index.html" onclick="sair()">Sair</a>
+  </div>
+</nav>
+
+<!-- ── Alerta Push de Proximidade (RF06) ── -->
+<div style="padding: 0.75rem 1.25rem 0;">
+  <div class="alerta-push" id="alertaPush">
+    🚛 <strong>Coletor a caminho!</strong> A Cooperativa Central está a aproximadamente 450 m do seu endereço. Deixe os resíduos prontos para coleta.
+  </div>
+</div>
+
+<!-- ── Conteúdo principal ── -->
+<main style="max-width: 860px; margin: 0 auto; padding: 1.25rem;">
+
+  <!-- Impacto comunitário (RF04) -->
+  <div class="eco-card">
+    <div class="eco-card-title">🌿 Seu Impacto Comunitário</div>
+    <div style="display:flex; align-items:flex-end; gap:1rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+      <div>
+        <div class="pontos-destaque" id="kgTotal">145 kg</div>
+        <div class="pontos-label">de resíduos reciclados</div>
+      </div>
+      <div>
+        <div class="pontos-destaque" style="font-size:1.5rem;" id="co2Evitado">87 kg</div>
+        <div class="pontos-label">de CO₂ evitado</div>
+      </div>
+      <div>
+        <div class="pontos-destaque" style="font-size:1.5rem; color: #E65100;" id="pontosUsuario">320</div>
+        <div class="pontos-label">pontos ecológicos 🏅</div>
+      </div>
+    </div>
+    <div class="impact-bar-wrap">
+      <div class="impact-bar-fill" id="barraImpacto" style="width: 58%;"></div>
+    </div>
+    <p style="font-size:0.78rem; color:#78909C; margin-top:0.4rem;">Meta mensal: 250 kg — você está a 105 kg da meta!</p>
+  </div>
+
+  <!-- Dashboard de stats (RF04) -->
+  <div class="eco-card">
+    <div class="eco-card-title">📊 Resumo por Categoria</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-valor">52 kg</div><div class="stat-desc">Plásticos</div></div>
+      <div class="stat-box"><div class="stat-valor">38 kg</div><div class="stat-desc">Papel / Papelão</div></div>
+      <div class="stat-box"><div class="stat-valor">29 kg</div><div class="stat-desc">Metais</div></div>
+      <div class="stat-box"><div class="stat-valor">26 kg</div><div class="stat-desc">Vidros + Óleo</div></div>
+    </div>
+  </div>
+
+  <!-- Agendamento de coleta (RF02) -->
+  <div class="eco-card">
+    <div class="eco-card-title">📅 Agendar Nova Coleta Seletiva</div>
+
+    <div class="form-group">
+      <label class="eco-label">Categorias disponíveis para coleta</label>
+      <div class="check-group" id="checkCategorias">
+        <label class="check-item"><input type="checkbox" value="Plásticos (PET, PEAD)" /> Plásticos</label>
+        <label class="check-item"><input type="checkbox" value="Vidros (Garrafas, Potes)" /> Vidros</label>
+        <label class="check-item"><input type="checkbox" value="Papel / Papelão" /> Papel</label>
+        <label class="check-item"><input type="checkbox" value="Metais (Latas, Alumínio)" /> Metais</label>
+        <label class="check-item"><input type="checkbox" value="Óleo de Cozinha Usado" /> Óleo</label>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:1rem;">
+      <label class="eco-label">Volume estimado</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="volume" value="Pequeno (até 5 kg)" /> Pequeno (até 5 kg)</label>
+        <label class="radio-item"><input type="radio" name="volume" value="Médio (5–20 kg)" /> Médio (5–20 kg)</label>
+        <label class="radio-item"><input type="radio" name="volume" value="Grande (acima de 20 kg)" /> Grande (acima de 20 kg)</label>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:1rem;">
+      <label class="eco-label" for="enderecoColeta">Endereço de coleta</label>
+      <input class="eco-input" type="text" id="enderecoColeta" placeholder="Confirme seu endereço" />
+    </div>
+
+    <div class="form-group">
+      <label class="eco-label" for="obsColeta">Observações (opcional)</label>
+      <input class="eco-input" type="text" id="obsColeta" placeholder="Ex.: Portão azul, campainha quebrada…" />
+    </div>
+
+    <button class="btn-eco" onclick="confirmarAgendamento()">✅ Confirmar Agendamento</button>
+  </div>
+
+  <!-- Gamificação / Recompensas (RF05) -->
+  <div class="eco-card">
+    <div class="eco-card-title">🏆 Recompensas e Parcerias</div>
+    <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.875rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem; background:var(--verde-suave); border-radius:6px;">
+        <span>☕ 10% off — Cafeteria EcoGreen</span>
+        <span style="font-weight:600; color:var(--verde-escuro);">200 pts</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem; background:var(--verde-suave); border-radius:6px;">
+        <span>🛒 Desconto mercado parceiro</span>
+        <span style="font-weight:600; color:var(--verde-escuro);">350 pts</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem; background:var(--verde-suave); border-radius:6px;">
+        <span>🌳 Apadrinhe uma árvore urbana</span>
+        <span style="font-weight:600; color:var(--verde-escuro);">500 pts</span>
+      </div>
+    </div>
+    <p style="font-size:0.78rem; color:#78909C; margin-top:0.75rem;">Seus pontos: <strong id="ptsBadge">320</strong> — acumule mais 30 para desbloquear o próximo prêmio!</p>
+  </div>
+
+  <!-- Histórico recente (RF02 / RF07) -->
+  <div class="eco-card">
+    <div class="eco-card-title">📋 Histórico de Coletas</div>
+    <div id="listaHistorico"></div>
+  </div>
+
+</main>
+
+<!-- ── Modal de confirmação ── -->
+<div class="eco-modal-overlay" id="modalConfirmacao">
+  <div class="eco-modal">
+    <h3>✅ Agendamento Confirmado!</h3>
+    <p id="resumoAgendamento" style="font-size:0.875rem; color:#546E7A; margin-top:0.5rem; line-height:1.5;"></p>
+    <div class="modal-actions">
+      <button class="btn-eco" onclick="fecharModal()">Ok, entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="eco-toast" id="toast"></div>
+
+<script src="app.js"></script>
+<script>
+  /* ── Autenticação (RF01) ── */
+  const usuario = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+  if (!usuario || usuario.perfil !== 'morador') window.location.href = 'index.html';
+
+  document.getElementById('nomeUsuario').textContent = '👤 ' + usuario.nome;
+  document.getElementById('enderecoColeta').value = usuario.endereco || '';
+
+  /* ── Alerta Push simulado (RF06) ── */
+  setTimeout(() => {
+    document.getElementById('alertaPush').classList.add('visivel');
+    setTimeout(() => document.getElementById('alertaPush').classList.remove('visivel'), 8000);
+  }, 3000);
+
+  /* ── Renderizar histórico ── */
+  function renderHistorico() {
+    const historico = obterHistorico();
+    const lista     = document.getElementById('listaHistorico');
+    if (historico.length === 0) {
+      lista.innerHTML = '<p style="font-size:0.875rem; color:#90A4AE;">Nenhuma coleta registrada ainda.</p>';
+      return;
+    }
+    lista.innerHTML = historico.map(h => `
+      <div class="historico-item">
+        <div>
+          <div style="font-weight:600;">${h.data}</div>
+          <div style="color:#78909C; font-size:0.8rem;">${h.categorias} — ${h.volume}</div>
+          ${h.justificativa ? `<div style="color:#C62828; font-size:0.78rem;">Recusa: ${h.justificativa}</div>` : ''}
+        </div>
+        <div style="text-align:right;">
+          <span class="badge-status badge-${h.status.toLowerCase()}">${h.status}</span>
+          ${h.pontos ? `<div style="font-size:0.78rem; color:#2E7D32; margin-top:0.2rem;">+${h.pontos} pts</div>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  /* ── Confirmar agendamento (RF02) ── */
+  function confirmarAgendamento() {
+    const checkboxes  = document.querySelectorAll('#checkCategorias input[type="checkbox"]:checked');
+    const volume      = document.querySelector('input[name="volume"]:checked');
+    const endereco    = document.getElementById('enderecoColeta').value.trim();
+    const obs         = document.getElementById('obsColeta').value.trim();
+
+    if (checkboxes.length === 0) { mostrarToast('Selecione ao menos uma categoria de material.'); return; }
+    if (!volume)                  { mostrarToast('Informe o volume estimado.'); return; }
+    if (!endereco)                { mostrarToast('Confirme o endereço de coleta.'); return; }
+
+    const categorias = Array.from(checkboxes).map(c => c.value).join(', ');
+    const agora      = new Date();
+    const dataFmt    = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+
+    const novaColeta = {
+      id: Date.now(),
+      data: dataFmt,
+      categorias,
+      volume: volume.value,
+      endereco,
+      obs,
+      status: 'Pendente',
+      pontos: null,
+      justificativa: null
+    };
+
+    salvarColeta(novaColeta);
+
+    document.getElementById('resumoAgendamento').innerHTML =
+      `<strong>Protocolo:</strong> #${novaColeta.id}<br>
+       <strong>Categorias:</strong> ${categorias}<br>
+       <strong>Volume:</strong> ${volume.value}<br>
+       <strong>Endereço:</strong> ${endereco}<br>
+       <strong>Status:</strong> Pendente — cooperativas da região foram notificadas.`;
+
+    document.getElementById('modalConfirmacao').classList.add('open');
+    renderHistorico();
+
+    /* Reset form */
+    document.querySelectorAll('#checkCategorias input').forEach(c => c.checked = false);
+    document.querySelectorAll('input[name="volume"]').forEach(r => r.checked = false);
+    document.getElementById('obsColeta').value = '';
+  }
+
+  function fecharModal() {
+    document.getElementById('modalConfirmacao').classList.remove('open');
+  }
+
+  function sair() { sessionStorage.clear(); }
+
+  renderHistorico();
+</script>
+
+</body>
+</html>

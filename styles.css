@@ -1,0 +1,403 @@
+/* =============================================
+   EcoRede — Estilos Globais
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --verde-escuro:  #1B5E20;
+  --verde-medio:   #2E7D32;
+  --verde-claro:   #43A047;
+  --verde-suave:   #E8F5E9;
+  --verde-borda:   #A5D6A7;
+  --cinza-texto:   #37474F;
+  --cinza-leve:    #F5F5F5;
+  --branco:        #FFFFFF;
+  --alerta:        #E65100;
+  --alerta-fundo:  #FFF3E0;
+  --azul-info:     #0277BD;
+  --radius:        8px;
+  --sombra:        0 2px 8px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cinza-leve);
+  color: var(--cinza-texto);
+  min-height: 100vh;
+}
+
+/* ── Navbar ── */
+.eco-navbar {
+  background: var(--verde-escuro);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--sombra);
+}
+.eco-navbar .brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--branco);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.eco-navbar .brand span { color: #A5D6A7; }
+.eco-navbar .nav-user {
+  color: #C8E6C9;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.eco-navbar .nav-user a {
+  color: #FFCCBC;
+  text-decoration: none;
+  font-weight: 500;
+}
+.eco-navbar .nav-user a:hover { text-decoration: underline; }
+
+/* ── Cards ── */
+.eco-card {
+  background: var(--branco);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.eco-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--verde-escuro);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Botões ── */
+.btn-eco {
+  background: var(--verde-medio);
+  color: var(--branco);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn-eco:hover { background: var(--verde-escuro); }
+
+.btn-eco-outline {
+  background: transparent;
+  color: var(--verde-medio);
+  border: 2px solid var(--verde-medio);
+  border-radius: var(--radius);
+  padding: 0.55rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-eco-outline:hover { background: var(--verde-suave); }
+
+.btn-danger {
+  background: #C62828;
+  color: var(--branco);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-danger:hover { background: #B71C1C; }
+
+.btn-success {
+  background: var(--verde-claro);
+  color: var(--branco);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-success:hover { background: var(--verde-medio); }
+
+/* ── Badges de status ── */
+.badge-status {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.badge-pendente  { background: #FFF9C4; color: #F57F17; }
+.badge-concluida { background: #E8F5E9; color: #2E7D32; }
+.badge-recusada  { background: #FFEBEE; color: #C62828; }
+.badge-coletando { background: #E3F2FD; color: #0277BD; }
+
+/* ── Barra de impacto ── */
+.impact-bar-wrap {
+  background: var(--verde-suave);
+  border-radius: 999px;
+  height: 14px;
+  overflow: hidden;
+  margin: 0.4rem 0;
+}
+.impact-bar-fill {
+  background: linear-gradient(90deg, var(--verde-claro), var(--verde-escuro));
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+
+/* ── Formulários ── */
+.eco-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cinza-texto);
+  margin-bottom: 0.3rem;
+}
+.eco-input, .eco-select {
+  width: 100%;
+  border: 1.5px solid var(--verde-borda);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--cinza-texto);
+  background: var(--branco);
+  outline: none;
+  transition: border 0.2s;
+}
+.eco-input:focus, .eco-select:focus { border-color: var(--verde-medio); }
+
+/* Checkboxes customizados */
+.check-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--verde-suave);
+  border: 1.5px solid var(--verde-borda);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  user-select: none;
+  transition: all 0.15s;
+}
+.check-item input[type="checkbox"] { accent-color: var(--verde-medio); width: 16px; height: 16px; }
+.check-item:has(input:checked) {
+  background: var(--verde-medio);
+  color: var(--branco);
+  border-color: var(--verde-medio);
+}
+
+/* Radios */
+.radio-group { display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap; }
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.radio-item input[type="radio"] { accent-color: var(--verde-medio); }
+
+/* ── Toast / Notificação ── */
+.eco-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--verde-escuro);
+  color: var(--branco);
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: none;
+  max-width: 320px;
+}
+.eco-toast.show { display: block; animation: fadeSlide 0.3s ease; }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modal ── */
+.eco-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 8000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.eco-modal-overlay.open { display: flex; }
+.eco-modal {
+  background: var(--branco);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.eco-modal h3 { color: var(--verde-escuro); margin-bottom: 0.75rem; }
+.eco-modal textarea {
+  width: 100%;
+  border: 1.5px solid var(--verde-borda);
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  font-family: 'Inter', sans-serif;
+  resize: vertical;
+  min-height: 90px;
+}
+.eco-modal .modal-actions { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: flex-end; }
+
+/* ── Parada do coletor ── */
+.parada-card {
+  border: 1.5px solid var(--verde-borda);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: var(--branco);
+  transition: opacity 0.4s;
+}
+.parada-card.concluida { opacity: 0.45; }
+.parada-card .parada-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.parada-numero {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--verde-claro);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.parada-acoes { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+
+/* ── Pontuação ── */
+.pontos-destaque {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+  line-height: 1;
+}
+.pontos-label { font-size: 0.8rem; color: #78909C; font-weight: 500; }
+
+/* ── Alerta push ── */
+.alerta-push {
+  background: var(--alerta-fundo);
+  border-left: 4px solid var(--alerta);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  font-size: 0.875rem;
+  color: #BF360C;
+  display: none;
+}
+.alerta-push.visivel { display: block; }
+
+/* ── Histórico item ── */
+.historico-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #ECEFF1;
+  font-size: 0.875rem;
+}
+.historico-item:last-child { border-bottom: none; }
+
+/* ── Tela de login ── */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1B5E20 0%, #43A047 100%);
+  padding: 1rem;
+}
+.login-card {
+  background: var(--branco);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 2.25rem 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.login-logo .logo-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+.login-logo h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+  margin-top: 0.3rem;
+}
+.login-logo p { font-size: 0.82rem; color: #78909C; }
+.tabs-login { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #ECEFF1; }
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #90A4AE;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.tab-btn.ativo { color: var(--verde-escuro); border-bottom-color: var(--verde-escuro); }
+.form-group { margin-bottom: 1rem; }
+.divider { text-align: center; color: #90A4AE; font-size: 0.8rem; margin: 1rem 0; }
+.btn-eco-full { width: 100%; justify-content: center; padding: 0.75rem; font-size: 0.95rem; }
+
+/* ── Dashboard stats ── */
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.stat-box {
+  background: var(--verde-suave);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+.stat-box .stat-valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--verde-escuro);
+}
+.stat-box .stat-desc { font-size: 0.78rem; color: #546E7A; margin-top: 0.2rem; }
+
+/* ── Responsivo ── */
+@media (max-width: 576px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .eco-card { padding: 1.1rem; }
+  .parada-acoes { flex-direction: column; }
+  .parada-acoes button { width: 100%; }
+}

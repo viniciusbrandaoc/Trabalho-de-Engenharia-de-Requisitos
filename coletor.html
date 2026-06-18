@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoRede — Painel do Coletor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ── Navbar (RF01) ── -->
+<nav class="eco-navbar">
+  <a class="brand" href="index.html">♻️ <span>Eco</span>Rede</a>
+  <div class="nav-user">
+    <span id="nomeUsuario">Carregando…</span>
+    <a href="index.html" onclick="sair()">Sair</a>
+  </div>
+</nav>
+
+<main style="max-width: 860px; margin: 0 auto; padding: 1.25rem;">
+
+  <!-- Cabeçalho da rota (RF03) -->
+  <div class="eco-card">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+      <div>
+        <div class="eco-card-title" style="margin-bottom:0.25rem;">🚛 Rota do Dia — Ativa</div>
+        <p style="font-size:0.82rem; color:#78909C;" id="setorAtual">Setor: Região Norte — Brasília/DF</p>
+      </div>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <button class="btn-eco-outline" onclick="recalcularRota()">🔄 Recalcular Rota</button>
+        <button class="btn-eco" onclick="ativarModoColeta()">▶ Iniciar Coleta</button>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem; display:flex; gap:1.5rem; flex-wrap:wrap; font-size:0.875rem;">
+      <div><strong id="totalParadas">0</strong> paradas no roteiro</div>
+      <div><strong id="paradasConcluidas">0</strong> concluídas</div>
+      <div><strong id="paradasPendentes">0</strong> pendentes</div>
+      <div style="color:var(--alerta);"><strong id="distTotal">—</strong> km estimados</div>
+    </div>
+  </div>
+
+  <!-- Aviso de solicitação urgente (RF08) -->
+  <div id="alertaUrgente" style="display:none;" class="eco-card" style="border-left:4px solid var(--alerta);">
+    <div style="background:var(--alerta-fundo); border-left:4px solid var(--alerta); border-radius:var(--radius); padding:0.85rem 1rem; font-size:0.875rem; color:#BF360C;">
+      ⚡ <strong>Solicitação urgente inserida pelo administrador!</strong> A rota foi recalculada automaticamente e uma nova parada foi adicionada ao roteiro.
+    </div>
+  </div>
+
+  <!-- Lista de paradas (RF03 / RF07) -->
+  <div class="eco-card">
+    <div class="eco-card-title">📍 Paradas do Roteiro (Ordenadas por Distância)</div>
+    <div id="listaParadas"></div>
+  </div>
+
+  <!-- Resumo de coleta do dia (RF04) -->
+  <div class="eco-card">
+    <div class="eco-card-title">📊 Resumo da Coleta de Hoje</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-valor" id="statColetado">0 kg</div><div class="stat-desc">Material coletado</div></div>
+      <div class="stat-box"><div class="stat-valor" id="statPontos">0</div><div class="stat-desc">Pontos distribuídos</div></div>
+      <div class="stat-box"><div class="stat-valor" id="statRecusadas">0</div><div class="stat-desc">Coletas recusadas</div></div>
+      <div class="stat-box"><div class="stat-valor" id="statCO2">0 kg</div><div class="stat-desc">CO₂ evitado</div></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Modal de recusa (RF07) ── -->
+<div class="eco-modal-overlay" id="modalRecusa">
+  <div class="eco-modal">
+    <h3>⚠️ Recusar / Registrar Problema</h3>
+    <p style="font-size:0.875rem; color:#546E7A; margin-bottom:0.75rem;">Informe o motivo da recusa para que o morador seja notificado.</p>
+    <textarea id="motivoRecusa" placeholder="Ex.: Resíduos biológicos misturados, material inacessível, portão fechado…"></textarea>
+    <div class="modal-actions">
+      <button class="btn-eco-outline" onclick="fecharModalRecusa()">Cancelar</button>
+      <button class="btn-danger" onclick="confirmarRecusa()">Confirmar Recusa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal de coleta concluída ── -->
+<div class="eco-modal-overlay" id="modalConcluida">
+  <div class="eco-modal">
+    <h3>✅ Coleta Confirmada!</h3>
+    <p id="resumoConcluida" style="font-size:0.875rem; color:#546E7A; margin-top:0.5rem; line-height:1.6;"></p>
+    <div class="modal-actions">
+      <button class="btn-eco" onclick="fecharModalConcluida()">Ok</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="eco-toast" id="toast"></div>
+
+<script src="app.js"></script>
+<script>
+  /* ── Autenticação (RF01) ── */
+  const usuario = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+  if (!usuario || usuario.perfil !== 'coletor') window.location.href = 'index.html';
+
+  document.getElementById('nomeUsuario').textContent = '🚛 ' + usuario.nome;
+
+  /* ── Dados das paradas (RF03) — inclui coletas agendadas + paradas fixas de demo ── */
+  let paradaAtualIdx = null;
+
+  const paradasDemo = [
+    { id: 1, nome: 'Residência Oliveira', endereco: 'QD 03, Jardim Botânico', distancia: 0.45, material: 'Plásticos e Metais', volume: 'Médio (~12 kg)', status: 'Pendente', urgente: false },
+    { id: 2, nome: 'Condomínio Jardim Verde — Bloco B', endereco: 'SQS 308, Asa Sul', distancia: 1.2, material: 'Óleo de Cozinha Usado', volume: '10 Litros', status: 'Pendente', urgente: false },
+    { id: 3, nome: 'Comércio Padaria Central', endereco: 'CLN 406, Asa Norte', distancia: 2.1, material: 'Papel / Papelão', volume: 'Grande (~35 kg)', status: 'Pendente', urgente: false },
+    { id: 4, nome: 'Residência Souza', endereco: 'QI 11, Lago Sul', distancia: 3.4, material: 'Vidros e Plásticos', volume: 'Pequeno (~4 kg)', status: 'Pendente', urgente: false },
+  ];
+
+  /* Merge com coletas agendadas pelos moradores */
+  function obterParadas() {
+    const coletasAgendadas = obterTodasColetas().filter(c => c.status === 'Pendente');
+    const extras = coletasAgendadas.map((c, i) => ({
+      id: 1000 + i,
+      nome: 'Morador via App',
+      endereco: c.endereco,
+      distancia: (Math.random() * 4 + 0.5).toFixed(1) * 1,
+      material: c.categorias,
+      volume: c.volume,
+      status: 'Pendente',
+      urgente: false,
+      coletaId: c.id
+    }));
+    return [...paradasDemo, ...extras].sort((a, b) => a.distancia - b.distancia);
+  }
+
+  let paradas = obterParadas();
+
+  function atualizarContadores() {
+    const total     = paradas.length;
+    const concluidas = paradas.filter(p => p.status === 'Concluída').length;
+    const recusadas  = paradas.filter(p => p.status === 'Recusada').length;
+    const pendentes  = paradas.filter(p => p.status === 'Pendente').length;
+    const distTotal  = paradas.reduce((s, p) => s + p.distancia, 0).toFixed(1);
+
+    document.getElementById('totalParadas').textContent     = total;
+    document.getElementById('paradasConcluidas').textContent = concluidas;
+    document.getElementById('paradasPendentes').textContent  = pendentes;
+    document.getElementById('distTotal').textContent         = distTotal;
+
+    /* Resumo de coleta */
+    const kgEstimado = concluidas * 14;
+    document.getElementById('statColetado').textContent  = kgEstimado + ' kg';
+    document.getElementById('statPontos').textContent    = concluidas * 20;
+    document.getElementById('statRecusadas').textContent = recusadas;
+    document.getElementById('statCO2').textContent       = Math.round(kgEstimado * 0.6) + ' kg';
+  }
+
+  function renderParadas() {
+    const lista = document.getElementById('listaParadas');
+    if (paradas.length === 0) {
+      lista.innerHTML = '<p style="font-size:0.875rem;color:#90A4AE;">Nenhuma solicitação pendente na região.</p>';
+      return;
+    }
+    lista.innerHTML = paradas.map((p, idx) => `
+      <div class="parada-card ${p.status !== 'Pendente' ? 'concluida' : ''}" id="parada-${p.id}">
+        <div class="parada-header">
+          <span class="parada-numero">Parada #${idx + 1} — ${p.distancia} km</span>
+          <span class="badge-status badge-${p.status.toLowerCase()}">${p.status}${p.urgente ? ' ⚡' : ''}</span>
+        </div>
+        <div style="font-weight:600; font-size:0.95rem;">${p.nome}</div>
+        <div style="font-size:0.82rem; color:#78909C;">${p.endereco}</div>
+        <div style="font-size:0.875rem; margin-top:0.4rem;">
+          📦 <strong>Material:</strong> ${p.material}<br>
+          ⚖️ <strong>Volume:</strong> ${p.volume}
+        </div>
+        ${p.status === 'Pendente' ? `
+        <div class="parada-acoes">
+          <button class="btn-success" onclick="marcarColetado(${p.id})">✅ Marcar como Coletado</button>
+          <button class="btn-danger"  onclick="abrirModalRecusa(${p.id})">❌ Recusar / Problema</button>
+        </div>` : p.status === 'Recusada' && p.justificativa ? `
+        <div style="font-size:0.78rem; color:#C62828; margin-top:0.5rem;">Motivo: ${p.justificativa}</div>` : ''}
+      </div>`).join('');
+
+    atualizarContadores();
+  }
+
+  /* ── Marcar como coletado (RF07) ── */
+  function marcarColetado(id) {
+    const p = paradas.find(x => x.id === id);
+    if (!p || p.status !== 'Pendente') return;
+    p.status = 'Concluída';
+
+    /* Atualiza coleta do morador se veio do app */
+    if (p.coletaId) atualizarStatusColeta(p.coletaId, 'Concluída', 20);
+
+    document.getElementById('resumoConcluida').innerHTML =
+      `<strong>${p.nome}</strong><br>
+       Endereço: ${p.endereco}<br>
+       Material: ${p.material}<br>
+       Volume: ${p.volume}<br><br>
+       O morador recebeu <strong>+20 pontos ecológicos</strong> e o impacto foi registrado no painel da comunidade.`;
+
+    document.getElementById('modalConcluida').classList.add('open');
+    renderParadas();
+  }
+
+  /* ── Recusa (RF07) ── */
+  let idRecusaAtual = null;
+  function abrirModalRecusa(id) { idRecusaAtual = id; document.getElementById('motivoRecusa').value = ''; document.getElementById('modalRecusa').classList.add('open'); }
+  function fecharModalRecusa()  { document.getElementById('modalRecusa').classList.remove('open'); }
+  function fecharModalConcluida() { document.getElementById('modalConcluida').classList.remove('open'); }
+
+  function confirmarRecusa() {
+    const motivo = document.getElementById('motivoRecusa').value.trim();
+    if (!motivo) { mostrarToast('Informe o motivo da recusa.'); return; }
+    const p = paradas.find(x => x.id === idRecusaAtual);
+    if (p) { p.status = 'Recusada'; p.justificativa = motivo; }
+    if (p && p.coletaId) atualizarStatusColeta(p.coletaId, 'Recusada', 0, motivo);
+    fecharModalRecusa();
+    renderParadas();
+    mostrarToast('Recusa registrada. Morador será notificado.');
+  }
+
+  /* ── Recalcular rota com parada urgente (RF08) ── */
+  function recalcularRota() {
+    const novaParada = {
+      id: 9999,
+      nome: 'Solicitação Urgente — Adm.',
+      endereco: 'SHN Quadra 01, Asa Norte',
+      distancia: 0.3,
+      material: 'Resíduos Eletrônicos',
+      volume: 'Médio (~8 kg)',
+      status: 'Pendente',
+      urgente: true
+    };
+    /* Remove duplicata se já existir */
+    paradas = paradas.filter(p => p.id !== 9999);
+    paradas.unshift(novaParada);
+    paradas.sort((a, b) => a.distancia - b.distancia);
+
+    document.getElementById('alertaUrgente').style.display = 'block';
+    renderParadas();
+    mostrarToast('⚡ Rota recalculada! Nova parada urgente adicionada.');
+  }
+
+  function ativarModoColeta() { mostrarToast('Modo de coleta ativado. Boa rota! 🚛'); }
+
+  function sair() { sessionStorage.clear(); }
+
+  renderParadas();
+</script>
+
+</body>
+</html>

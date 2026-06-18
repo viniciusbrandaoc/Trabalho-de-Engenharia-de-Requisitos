@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoRede — Entrar</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-icon">♻️</div>
+      <h1>EcoRede</h1>
+      <p>Gestão e Monitoramento de Coleta Seletiva</p>
+    </div>
+
+    <!-- Abas: Entrar / Cadastrar -->
+    <div class="tabs-login">
+      <button class="tab-btn ativo" id="tabEntrar" onclick="mostrarAba('entrar')">Entrar</button>
+      <button class="tab-btn" id="tabCadastrar" onclick="mostrarAba('cadastrar')">Cadastrar</button>
+    </div>
+
+    <!-- ── Formulário de Login ── -->
+    <div id="abaEntrar">
+      <div class="form-group">
+        <label class="eco-label" for="loginEmail">E-mail</label>
+        <input class="eco-input" type="email" id="loginEmail" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="eco-label" for="loginSenha">Senha</label>
+        <input class="eco-input" type="password" id="loginSenha" placeholder="••••••••" />
+      </div>
+      <div class="form-group">
+        <label class="eco-label" for="loginPerfil">Perfil</label>
+        <select class="eco-select" id="loginPerfil">
+          <option value="">Selecione o perfil…</option>
+          <option value="morador">🏠 Morador Consciente</option>
+          <option value="coletor">🚛 Cooperativa / Coletor</option>
+        </select>
+      </div>
+      <button class="btn-eco btn-eco-full" onclick="fazerLogin()">Entrar no sistema</button>
+      <p id="erroLogin" style="color:#C62828;font-size:0.82rem;margin-top:0.6rem;display:none;"></p>
+    </div>
+
+    <!-- ── Formulário de Cadastro (RF01) ── -->
+    <div id="abaCadastrar" style="display:none;">
+      <div class="form-group">
+        <label class="eco-label" for="cadNome">Nome completo</label>
+        <input class="eco-input" type="text" id="cadNome" placeholder="Seu nome" />
+      </div>
+      <div class="form-group">
+        <label class="eco-label" for="cadEmail">E-mail</label>
+        <input class="eco-input" type="email" id="cadEmail" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="eco-label" for="cadSenha">Senha</label>
+        <input class="eco-input" type="password" id="cadSenha" placeholder="Mínimo 8 caracteres" />
+      </div>
+      <div class="form-group">
+        <label class="eco-label" for="cadPerfil">Perfil de acesso</label>
+        <select class="eco-select" id="cadPerfil">
+          <option value="">Selecione…</option>
+          <option value="morador">🏠 Morador Consciente</option>
+          <option value="coletor">🚛 Cooperativa / Coletor</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="eco-label" for="cadEndereco">Endereço (Morador)</label>
+        <input class="eco-input" type="text" id="cadEndereco" placeholder="Ex.: QD 03, Jardim Botânico, Brasília - DF" />
+      </div>
+      <button class="btn-eco btn-eco-full" onclick="fazerCadastro()">Criar conta</button>
+      <p id="erroCadastro" style="color:#C62828;font-size:0.82rem;margin-top:0.6rem;display:none;"></p>
+      <p id="sucCadastro" style="color:#2E7D32;font-size:0.82rem;margin-top:0.6rem;display:none;"></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* ── Usuários pré-cadastrados para demo ── */
+  const usuariosDemo = [
+    { email: 'morador@eco.com', senha: '12345678', perfil: 'morador', nome: 'Ian Felipe', endereco: 'QD 03, Jardim Botânico, Brasília - DF' },
+    { email: 'coletor@eco.com', senha: '12345678', perfil: 'coletor', nome: 'Carlos da Cooperativa', setor: 'Região Norte' }
+  ];
+
+  function mostrarAba(aba) {
+    document.getElementById('abaEntrar').style.display    = aba === 'entrar'    ? 'block' : 'none';
+    document.getElementById('abaCadastrar').style.display = aba === 'cadastrar' ? 'block' : 'none';
+    document.getElementById('tabEntrar').classList.toggle('ativo',    aba === 'entrar');
+    document.getElementById('tabCadastrar').classList.toggle('ativo', aba === 'cadastrar');
+  }
+
+  function fazerLogin() {
+    const email  = document.getElementById('loginEmail').value.trim();
+    const senha  = document.getElementById('loginSenha').value;
+    const perfil = document.getElementById('loginPerfil').value;
+    const erro   = document.getElementById('erroLogin');
+
+    if (!email || !senha || !perfil) { erro.textContent = 'Preencha todos os campos.'; erro.style.display = 'block'; return; }
+
+    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]').concat(usuariosDemo);
+    const usuario  = usuarios.find(u => u.email === email && u.senha === senha && u.perfil === perfil);
+
+    if (!usuario) { erro.textContent = 'Credenciais inválidas. Verifique e-mail, senha e perfil.'; erro.style.display = 'block'; return; }
+
+    sessionStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+    erro.style.display = 'none';
+    window.location.href = perfil === 'morador' ? 'morador.html' : 'coletor.html';
+  }
+
+  function fazerCadastro() {
+    const nome     = document.getElementById('cadNome').value.trim();
+    const email    = document.getElementById('cadEmail').value.trim();
+    const senha    = document.getElementById('cadSenha').value;
+    const perfil   = document.getElementById('cadPerfil').value;
+    const endereco = document.getElementById('cadEndereco').value.trim();
+    const erro     = document.getElementById('erroCadastro');
+    const suc      = document.getElementById('sucCadastro');
+
+    if (!nome || !email || !senha || !perfil) { erro.textContent = 'Preencha todos os campos obrigatórios.'; erro.style.display = 'block'; suc.style.display = 'none'; return; }
+    if (senha.length < 8) { erro.textContent = 'A senha deve ter no mínimo 8 caracteres.'; erro.style.display = 'block'; return; }
+
+    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+    if (usuarios.find(u => u.email === email)) { erro.textContent = 'Este e-mail já está cadastrado.'; erro.style.display = 'block'; return; }
+
+    usuarios.push({ nome, email, senha, perfil, endereco });
+    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+    erro.style.display = 'none';
+    suc.textContent = 'Conta criada com sucesso! Faça o login.';
+    suc.style.display = 'block';
+    setTimeout(() => mostrarAba('entrar'), 1800);
+  }
+</script>
+
+</body>
+</html>
